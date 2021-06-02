@@ -1,0 +1,219 @@
+<html>
+<head>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1" crossorigin="anonymous">
+    <script
+            src="https://code.jquery.com/jquery-3.5.1.min.js"
+            integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0="
+            crossorigin="anonymous">
+    </script>
+    <style>
+        hr {
+            margin-top: 1rem;
+            margin-bottom: 1rem;
+            border: 0;
+            border-top: 1px solid rgba(0, 0, 0, 0.1);
+        }
+        .footer {
+            font-size: 9px;
+        }
+
+        @page {
+            size: A4;
+            margin: 11mm 17mm 17mm 17mm;
+        }
+
+        @media print {
+            .footer {
+                position: fixed;
+                bottom: 0;
+            }
+
+            .content-block, p {
+                page-break-inside: avoid;
+            }
+
+            html, body {
+                width: 210mm;
+                height: 297mm;
+            }
+        }
+    </style>
+    <script src="../js/html2pdf/html2pdf.bundle.min.js"></script>
+</head>
+<body style="background-color: #0a0a0a;">
+<button id="show_pdf">Download</button>
+<div class="card" style="margin: 30px 30px 30px;">
+    <div class="card-header"></div>
+    <div class="card-body" id="view_pdf">
+        <div class="container" align="center">
+            <div class="row">
+                <div class="col-lg col align-self-end" style="text-align: left; font-size: 14px;">
+                    <strong>{{ invoice.getSName|upper }}</strong>
+                </div>
+                <div class="col-lg">
+                    <img style="margin:0 0 0 0;width:90px; height: 103px;" src="../img/logo_small.png">
+                    <div style="font-size: 11px;"><strong>{{ invoice.website }}</strong></div>
+                </div>
+                <div class="col-lg col align-self-end" style="text-align: right; font-size: 14px;">
+                    <strong>Factura Seria: {{ invoice.getInvoiceSerie|upper }} Nr. {{ "%06d"|format(invoice.getInvoiceNumber) }}</strong>
+                </div>
+            </div>
+        </div>
+        <hr/>
+
+        <div class="container" align="center">
+            <div class="row">
+                <div class="col-lg col align-self-end" style="text-align: left">
+                    <table style="font-size: 9px; font-weight: 800;">
+                        <tbody>
+                        <tr>
+                            <td width="30%">Nr.Ord.Reg.Com:</td><td>{{ invoice.getSNoroc|upper }}</td>
+                        </tr>
+                        <tr>
+                            <td>C.I.F:</td><td>{{ invoice.getSCif|upper }}</td>
+                        </tr>
+                        <tr>
+                            <td>Sediu:</td><td>{{ invoice.getSAddress }}</td>
+                        </tr>
+                        <tr>
+                            <td>Banca:</td><td>{{ invoice.getSBankName|upper }}</td>
+                        </tr>
+                        <tr>
+                            <td>Cont:</td><td>{{ invoice.getSBankAccount|upper }}</td>
+                        </tr>
+                        <tr>
+                            <td>Telefon:</td><td>{{ invoice.getSPhone }}</td>
+                        </tr>
+                        <tr>
+                            <td>Email:</td><td>{{ invoice.getSEmail }}</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="col-lg col align-self-end" style="text-align: right">
+                    <table align="right" style="font-size: 9px; font-weight: 800;">
+                        <tbody>
+                        <tr>
+                            <td width="43%">Nume:</td><td>{{ invoice.getBName }}</td>
+                        </tr>
+                        <tr>
+                            <td>Nr.Ord.Reg.Com:</td><td>{{ invoice.getBNoroc|upper }}</td>
+                        </tr>
+                        <tr>
+                            <td>C.I.F:</td><td>{{ invoice.getBCif|upper }}</td>
+                        </tr>
+                        <tr>
+                            <td>Adresa:</td><td>{{ invoice.getBAddress }}</td>
+                        </tr>
+                        <tr>
+                            <td>Judet:</td><td>{{ invoice.getBCounty }}</td>
+                        </tr>
+                        <tr>
+                            <td>Banca:</td><td>{{ invoice.getBBankName|upper }}</td>
+                        </tr>
+                        <tr>
+                            <td>Cont:</td><td>{{ invoice.getBBankAccount|upper }}</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="container" align="center" style="padding-top: 15px;">
+            <div class="row">
+                <div class="col-lg align-self-end" style="text-align: left">
+                    <div style="font-size: 9px;"><strong>Data emiterii: {{ invoice.getInvoiceIssueDate|date('d-M-Y') }}</strong></div>
+                    <div style="font-size: 9px;"><strong>De catre: {{ invoice.getIssuerName }}</strong></div>
+                </div>
+                <div class="col-lg col align-self-end" style="text-align: right">
+                    <div style="font-size: 9px;"><strong>Modalitate de plata: {{ invoice.getPaymentType }}</strong></div>
+                    <div style="font-size: 9px;"><strong>Scadenta la: {{ invoice.getInvoiceDueDate|date('d-M-Y') }}</strong></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="container" align="center" style="padding-top: 25px;">
+            <table style="width: 100%; font-size: 11px;">
+                <thead>
+                <tr>
+                    <th style="border-bottom: solid 1px;">Nr. Crt.</th><th style="border-bottom: solid 1px;">Produs/Serviciu</th>
+                    <th style="border-bottom: solid 1px;">U.M.</th><th style="border-bottom: solid 1px;">Cantitate</th>
+                    <th style="border-bottom: solid 1px;">Pret Unitar</th><th style="border-bottom: solid 1px;">Valoare</th>
+                    <th style="border-bottom: solid 1px;">TVA 19%</th><th style="border-bottom: solid 1px;">Valoare cu TVA</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for key, row in products %}
+                <tr>
+                    <td style="border-bottom: solid 1px rgba(0, 0, 0, 0.1);">{{ key+1 }}</td>
+                    <td style="border-bottom: solid 1px rgba(0, 0, 0, 0.1);">{{ row.getName }} </td>
+                    <td style="border-bottom: solid 1px rgba(0, 0, 0, 0.1);">{{ row.getUm }}</td>
+                    <td style="border-bottom: solid 1px rgba(0, 0, 0, 0.1);">{{ row.getQty }}</td>
+                    <td style="border-bottom: solid 1px rgba(0, 0, 0, 0.1);">{{ row.getPrice }} Lei</td>
+                    <td style="border-bottom: solid 1px rgba(0, 0, 0, 0.1);">{{ row.getValue }} Lei</td>
+                    <td style="border-bottom: solid 1px rgba(0, 0, 0, 0.1);">{{ row.getValueWithVat - row.getValue }} Lei</td>
+                    <td style="border-bottom: solid 1px rgba(0, 0, 0, 0.1);">{{ row.getValueWithVat }} Lei</td>
+                </tr>
+                {% endfor %}
+                </tbody>
+                <tfoot>
+                <tr>
+                    <td style="height: 40px;"></td><td></td><td></td><td></td>
+                    <td><strong>Total:</strong></td>
+                    <td><strong>{{ invoice.getTotalWithoutVat }} Lei</strong></td>
+                    <td><strong>{{ invoice.getTotalWithVat - invoice.getTotalWithoutVat }} Lei</strong></td>
+                    <td><strong><u>{{ invoice.getTotalWithVat }} Lei</u></strong></td>
+                </tr>
+                </tfoot>
+            </table>
+        </div>
+
+        <div class="container footer" align="center">
+            <div class="row" style="border: solid 1px; font-size: 9px;">
+                <div class="col-lg col align-self-start" style="text-align: left; margin: 5px 0 0;">
+                    Factura circula fara semnatura si fara stampila<br>
+                    conf. art. 319 (29) din Codul Fiscal.
+                </div>
+                <div class="col-lg align-self-start" style="text-align: left; margin: 5px 0 5px;">
+                    Date privind expeditia<br>
+                    Numele delegatului: <strong>{{ invoice.getShippDelegatedName }}</strong><br>
+                    C.I.: <strong>{{ invoice.getCiSerie }}</strong> nr. <strong>{{ invoice.getCiNumber }}</strong><br>
+                    Eliberat(a) de: <strong>{{ invoice.getCiIssuerName }}</strong><br>
+                    Mijloc de transport nr: <strong>{{ invoice.getDeliveryMethod }}</strong><br>
+                    Expeditia s-a efectuat in prezenta noasta la <br>
+                    data: <strong>{{ invoice.getDeliveryDateTime|date('d-M-Y') }}</strong> ora: <strong>{{ invoice.getDeliveryDateTime|date('H;i') }}</strong><br>
+                </div>
+                <div class="col-lg col align-self-start" style="text-align: center;margin: 5px 0 5px;">
+                    Semnatura de primire:
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+<script>
+    $('#show_pdf').click(function () {
+        var element = document.getElementById('view_pdf');
+        element.style.display = 'block';
+        var opt = {
+            margin:       0.2,
+            filename:     '{{ invoice.getInvoiceSerie }}_{{ "%06d"|format(invoice.getInvoiceNumber) }}',
+            image:        { type: 'jpeg', quality: 1 },
+            html2canvas: {
+                dpi: 600,
+                scale:4,
+                letterRendering: true,
+                useCORS: true
+            },
+            jsPDF:        { unit: 'in', format: 'A4', orientation: 'portrait' }
+        };
+
+        // New Promise-based usage:
+        html2pdf().set(opt).from(element).save();
+
+        // Old monolithic-style usage:
+        html2pdf(element, opt);
+    });
+</script>
+</html>

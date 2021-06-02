@@ -1,0 +1,45 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Hello UserProfileController!{% endblock %}
+
+{% block body %}
+    <div class="card">
+        <div class="card-header"></div>
+        <div class="card-body">
+            <table id="list_invoices" class="display" style="width:100%">
+                <thead>
+                <tr>
+                    <th>No.</th>
+                    <th>Document</th>
+                    <th>Client</th>
+                    <th>Issue Date</th>
+                    <th>Due Date</th>
+                    <th>Total</th>
+                    <th></th>
+                    <th></th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for key, row in invoices %}
+                    <tr>
+                        <td>{{ key+1 }}</td>
+                        <td>{{ row.getInvoiceSerie }}: {{ "%06d"|format(row.getInvoiceNumber) }}</td>
+                        <td>{{ row.getBname }}</td>
+                        <td>{{ row.getInvoiceIssueDate|date('d-M-Y') }}</td>
+                        <td>{{ row.getInvoiceDueDate|date('d-M-Y') }}</td>
+                        <td>{{ row.getTotalWithVat }}</td>
+                        <td align="right"><a href="{{ path('delete_invoice' ,{"id": row.getId}) }}"><button type="button" id="remove_single_product"><i class="fa fa-trash" style="font-size:18px"></i></button></a></td>
+                        <td align="right"><a href="{{ path('view_invoice' ,{"id": row.getId}) }}"><button type="button" id="remove_single_product"><i class="fa fa-eye" style="font-size:18px"></i></button></a></td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div class="card-footer"></div>
+    </div>
+    <script>
+        $(document).ready(function() {
+            $('#list_invoices').DataTable();
+        });
+    </script>
+{% endblock %}

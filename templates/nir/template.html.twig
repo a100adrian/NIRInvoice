@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link href="//netdna.bootstrapcdn.com/bootstrap/3.1.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+
+    <script>
+        window.onload = function () {
+            document.getElementById("download").addEventListener("click", () => {
+                const invoice = this.document.getElementById("invoice");
+            var opt = {
+                margin: 0,
+                filename: '{{ nir.getNirSerie }}_{{ "%06d"|format(nir.getNirNumber) }}',
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: {
+                    dpi: 600,
+                    scale:4,
+                    letterRendering: true,
+                    useCORS: true
+                },
+                jsPDF: { unit: 'in', format: 'A4', orientation: 'landscape' }
+            };
+            html2pdf().from(invoice).set(opt).save();
+        })
+        }
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.2/html2pdf.bundle.js"></script>
+    <style>
+        body {
+            margin: 0;
+            line-height: 1.5385;
+            color: #333;
+            text-align: left;
+            background-color: #000
+        }
+
+        .card {
+            position: relative;
+            display: -ms-flexbox;
+            display: flex;
+            -ms-flex-direction: column;
+            flex-direction: column;
+            min-width: 0;
+            word-wrap: break-word;
+            background-color: #fff;
+            background-clip: border-box;
+            border: 1px solid rgba(0, 0, 0, .125);
+            border-radius: .1875rem
+        }
+
+        .invoice-title h2, .invoice-title h3 {
+            display: inline-block;
+        }
+
+        .table > tbody > tr > .no-line {
+            border-top: none;
+        }
+
+        .table > thead > tr > .no-line {
+            border-bottom: none;
+        }
+
+        .table > tbody > tr > .thick-line {
+            border-top: 2px solid;
+        }
+    </style>
+
+</head>
+<body>
+<div class="offset-xl-2 col-xl-8 col-lg-12 col-md-12 col-sm-12 col-12 padding">
+    <div class="col-md-12">
+        <div align="right"><button class="btn btn-primary" id="download">Download</button></div>
+        <div class="card" style="margin: 5px 0 0 0; border: none;" id="invoice">
+            <div align="center" style="font-size: 19px;"><strong>NOTA DE RECEPTIE</strong></div>
+            <br>
+            <br>
+            <table style="width: 70%; font-size: 11px;" align="center">
+                <tbody>
+                <tr>
+                    <td>
+                        Unitate: {{ nir.receiver }}
+                    </td>
+                    <td align="right">NIR: {{ nir.getNirSerie }} {{ "%06d"|format(nir.getNirNumber) }}</td>
+                </tr>
+                <tr>
+                    <td>
+                        Gestiunea:Cantitativ Valoric cu TVA
+                    </td>
+                    <td align="right">Data: {{ nir.date|date('Y-m-d') }}</td>
+                </tr>
+                <tr>
+                    <td>
+                        Furnizor: {{ nir.supplier }}
+                    </td>
+                    <td align="right">Factura: {{ nir.invoiceNumber }}</td>
+                </tr>
+                </tbody>
+            </table>
+            <br>
+            <table style="border: 1px solid; font-size: 9px; margin: 0 2px 0 2px;">
+                <thead>
+                <tr>
+                    <th style="border-bottom: 1px solid;">Nr. Crt.</th>
+                    <th style="border-bottom: 1px solid;">Denumire Produs/Serviciu/Cod</th>
+                    <th style="border-bottom: 1px solid;">Tip Produs/Serviciu</th>
+                    <th style="border-bottom: 1px solid;">U.M.</th>
+                    <th style="border-bottom: 1px solid;">Cantitate</th>
+                    <th style="border-bottom: 1px solid;">Pret Unitar(Lei)</th>
+                    <th style="border-bottom: 1px solid;">Valoare(Lei)</th>
+                    <th style="border-bottom: 1px solid;">Observatii</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for key, line in products %}
+                    <tr>
+                        <td style="border-bottom: solid 1px; width: 3%; text-align: center;">{{ key+1 }}</td>
+                        <td style="border-bottom: solid 1px;">{{ line.getName }}</td>
+                        <td style="border-bottom: solid 1px;">{{ line.getType }}</td>
+                        <td style="border-bottom: solid 1px;">{{ line.um }}</td>
+                        <td style="border-bottom: solid 1px;">{{ line.qty }}</td>
+                        <td style="border-bottom: solid 1px;">{{ line.price }}</td>
+                        <td style="border-bottom: solid 1px;">{{ line.getValue }}</td>
+                        <td style="border-bottom: solid 1px;">{{ line.obs }}</td>
+                    </tr>
+                {% endfor %}
+                <tr>
+                    <td height="10"></td>
+                </tr>
+                <tr>
+                    <td colspan="4"></td>
+                    <td><strong>Total Inventar:</strong></td>
+                    <td><strong>{{ totals.inventar }} Lei</strong></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td colspan="4"></td>
+                    <td><strong>Total Consumabile:</strong></td>
+                    <td><strong>{{ totals.consumabile }} Lei</strong></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td colspan="4"></td>
+                    <td><strong>Total Materiale/Marfuri:</strong></td>
+                    <td><strong>{{ totals.marfuri }} Lei</strong></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td height="10"></td>
+                </tr>
+                <tr>
+                    <td></td>
+                    {% set total = totals.marfuri +  totals.consumabile +  totals.inventar %}
+                    <td><strong>TOTAL NIR: {{ total }} Lei</strong></td>
+                    <td colspan="1" align="right" height=" 50"><strong>Observatii: </strong> </td>
+                    <td colspan="5" style="border: solid 1px; border-bottom: none; border-right: none;
+                        padding-top: 5px; padding-left: 5px;">
+                        {{ nir.getComments }}
+                    </td>
+                    <td colspan="5" style="border: 1px none;border-top-style: solid;"></td>
+                </tr>
+                </tbody>
+            </table>
+            <br>
+            <br>
+            <br>
+            <br>
+            <table style="height: 100px;font-size: 9px; margin: 0 2px 0 2px;">
+                <thead>
+                <tr>
+                    <th style="border-left: solid 1px; border-top: solid 1px; border-right: solid 1px; text-align: center;">
+                        Numele si Prenumele Membrilor Comisiei de Receptie
+                    </th>
+                    <th style="border-top: solid 1px;border-right: solid 1px; text-align: center;">
+                        Semnatura
+                    </th>
+                    <th style="border-top: solid 1px;border-right: solid 1px; text-align: center;">
+                        Numele si Prenumele Gestionarului
+                    </th>
+                    <th style="border-top: solid 1px;border-right: solid 1px; text-align: center;">
+                        Semnatura
+                    </th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td valign="top" style="border-bottom: solid 1px;border-left: solid 1px;border-top: solid 1px;
+                        padding-top: 5px; padding-left: 5px;">
+                        <strong>{{ nir.getReceptionCommittee }}</strong><br>
+                    </td>
+                    <td style="border-bottom: solid 1px;border-left: solid 1px;border-top: solid 1px;"></td>
+                    <td valign="top" style="border-bottom: solid 1px;border-left: solid 1px;border-top: solid 1px;
+                        padding-top: 5px; padding-left: 5px;">
+                        <strong>{{ nir.stockManager }}</strong>
+                    </td>
+                    <td style="border: 1px solid;"></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+</body>
+</html>

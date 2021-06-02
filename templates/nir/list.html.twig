@@ -1,0 +1,45 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Hello UserProfileController!{% endblock %}
+
+{% block body %}
+    <div class="card">
+        <div class="card-header"></div>
+        <div class="card-body">
+            <table id="list_nirs" class="display">
+                <thead>
+                <tr>
+                    <th>No.</th>
+                    <th>Document</th>
+                    <th>Supplier</th>
+                    <th>Date</th>
+                    <th></th>
+                    <th></th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for key, row in nirs %}
+                    <tr>
+                        <td>{{ key + 1 }}</td>
+                        <td>{{ row.getNirSerie }}:{{ "%06d"|format(row.getNirNumber) }}</td>
+                        <td>{{ row.getSupplier }}</td>
+                        <td>{{ row.getDate|date('Y-m-d') }}</td>
+                        <td align="right"><a href="{{ path('view_nir' ,{"id": row.getId}) }}">
+                                <button type="button" id=""><i class="fa fa-eye" style="font-size:18px"></i></button></a>
+                        </td>
+                        <td align="right"><a href="{{ path('delete_nir' ,{"id": row.getId}) }}">
+                                <button type="button" id=""><i class="fa fa-trash" style="font-size:18px"></i></button></a>
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div class="card-footer"></div>
+    </div>
+    <script>
+        $(document).ready(function() {
+            $('#list_nirs').DataTable();
+        });
+    </script>
+{% endblock %}

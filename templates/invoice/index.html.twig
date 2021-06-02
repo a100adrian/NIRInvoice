@@ -1,0 +1,239 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Hello MainController!{% endblock %}
+{% block body %}
+    <div class="card">
+        {{ form_start(form) }}
+        <div class="card-header"></div>
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="headingTwo">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                    <strong>Invoice form</strong>
+                </button>
+            </h2>
+            <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#accordionExample">
+                <div class="accordion-body">
+                    <div class="card-body">
+                        <div class="row" id="invoice-form-details">
+                            <div class="col-sm-6">
+                                <div class="card">
+                                    <div class="card-body">
+                                        {#{{ form_row(form.s_name) }}#}
+                                        {#{{ form_row(form.s_noroc) }}#}
+                                        {#{{ form_row(form.s_cif) }}#}
+                                        {#{{ form_row(form.s_phone_number) }}#}
+                                        {#{{ form_row(form.s_address) }}#}
+                                        {#{{ form_row(form.s_bank_name) }}#}
+                                        {#{{ form_row(form.s_bank_account) }}#}
+                                        {{ form_row(form.invoice_issue_date) }}
+                                        {{ form_row(form.invoice_due_date) }}
+                                        {#{{ form_row(form.issue_name) }}#}
+                                        <br>
+                                        <div class="input-group mb-3">
+                                            {{ form_row(form.ci_serie) }}
+                                            &nbsp;
+                                            &nbsp;
+                                            {{ form_row(form.ci_number) }}
+                                        </div>
+                                        {{ form_row(form.ci_issuer_name) }}
+                                        {{ form_row(form.payment_type) }}
+                                        {{ form_row(form.delivery_method) }}
+                                        {{ form_row(form.delivery_date_time) }}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="card">
+                                    <div class="card-body">
+                                        {{ form_row(form.b_name) }}
+                                        {{ form_row(form.shipp_delegated_name) }}
+                                        {{ form_row(form.b_noroc) }}
+                                        {{ form_row(form.b_cif) }}
+                                        {{ form_row(form.b_address) }}
+                                        {{ form_row(form.b_county) }}
+                                        {{ form_row(form.b_bank_account) }}
+                                        {{ form_row(form.b_bank_name) }}
+                                        {#{{ form_row(form.website) }}#}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-header" id="selected_products_holder" style="margin: 0 10px 0 10px;">
+                <table id="display_selected_products" class="display" style="width:100%"><thead style="border-bottom: solid 1px;"><tr><th>Name</th><th>Um</th><th>Qty</th><th>Price</th><th>Value</th></tr></thead><tbody></tbody></table>
+            </div>
+            <div class="card-body">
+                <table id="display_stock" class="display" style="width:100%" data-prototype="{{ form_widget(form.billed_products_models.vars.prototype)|e('html_attr') }}">
+                    <thead>
+                    <tr>
+                        <th>Stock</th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr id="non_stock_list">
+                        <td class = "n_add_form" id="non_stock_name">
+                            <input id="n_name" size="40" type="text" placeholder="Add non existing stock">
+                        </td>
+                        <td></td>
+                        <td class = "n_add_form" id="non_stock_um" align="right">
+                            <input id="n_um" type="text" placeholder="UM">
+                        </td>
+                        <td class = "n_add_form" id="non_stock_qty" align="right">
+                            <input id="n_qty" type="text" placeholder="Qty">
+                        </td>
+                        <td class = "n_add_form" id="non_stock_price" align="right">
+                            <input id="n_price" type="text" placeholder="Price">
+                        </td>
+                        <td class = "n_add_form" id="non_stock_price" align="right">
+                            <input id="n_type" type="hidden" value="non-stock">
+                        </td>
+                        <td class = "n_add_form" id="non_stock_add_product" align="right">
+                            <button type="button" id="add_single_product"><i class="fa fa-plus" style="font-size:18px"></i></button>
+                        </td>
+                    </tr>
+                    {% for i, row in stock %}
+                        <tr id="stock_list">
+                            <td id="f_name{{ i }}">{{ row.name }}</td>
+                            <td align="right">{{ row.qty }}</td>
+                            <td class="add_form" id="f_um{{ i }}" align="right">
+                                <input id="um{{ i }}" type="text" placeholder="UM">
+                            </td>
+                            <td class="add_form" id="f_qty{{ i }}" align="right">
+                                <input id="qty{{ i }}" type="text" placeholder="QTY">
+                            </td>
+                            <td class="add_form" id="f_price{{ i }}" align="right">
+                                <input id="price{{ i }}" type="text" placeholder="Price">
+                            </td>
+                            <td class="add_form" id="f_type{{ i }}" align="right">
+                                <input id="type{{ i }}" type="hidden" value="{{ row.getType }}">
+                            </td>
+                            <td class="add_form" style="display: none;" id="f_hash{{ i }}" align="right">{{ row.hash }}</td>
+                            <td class="add_form" id="f_add_product{{ i }}" align="right">
+                                <button type="button" id="add_single_product{{ i }}"><i class="fa fa-plus" style="font-size:18px"></i></button>
+                            </td>
+                        </tr>
+                        <script>
+                            $(document).ready(function () {
+                                $collectionHolder = $('#display_stock');
+                                $collectionHolder.data('index', $collectionHolder.find('#stock_list').length);
+                                $('#add_single_product{{ i }}').click( function () {
+                                    addForm({{ i }})
+                                });
+                            });
+                            function addForm(index) {
+                                console.log(index);
+                                var $table = $('#display_selected_products');
+                                var $qty = $('#qty'+index).val();
+                                var $p = $('#price'+index).val();
+                                var $type = $('#type'+index).val();
+                                var $um = $('#um'+index).val();
+                                var $hash = $('#f_hash'+index).text();
+                                var $name = $('#f_name'+index).text();
+                                var value = getVal($qty, $p);
+                                var newForm = $collectionHolder.data('prototype');
+                                newForm = newForm.replace(/__name__/g, index);
+                                newForm = newForm.replace(/\[name]" required="required"/g, '[name]" required="required" value="'+$name+'"');
+                                newForm = newForm.replace(/\[um]" required="required"/g, '[um]" required="required" value="'+$um+'"');
+                                newForm = newForm.replace(/\[qty]" required="required"/g, '[qty]" required="required" value="'+$qty+'"');
+                                newForm = newForm.replace(/\[price]" required="required"/g, '[price]" required="required" value="'+$p+'"');
+                                newForm = newForm.replace(/\[type]" required="required"/g, '[type]" required="required" value="'+$type+'"');
+                                newForm = newForm.replace(/\[value]" required="required"/g, '[value]" required="required" value="'+value+'"');
+                                newForm = newForm.replace(/\[hash]" required="required"/g, '[hash]" required="required" value="'+$hash+'"');
+                                var row = '<tr class="tr_append-row">' +
+                                    '<td>'+$name+'</td>' +
+                                    '<td>'+$um+'</td>' +
+                                    '<td>'+$qty+'</td>' +
+                                    '<td>'+$p+'</td>' +
+                                    '<td>'+value+'</td>' +
+                                    '<td align="right">'+'<button type="button" id="remove_single_product'+index+'"><i class="fa fa-trash" style="font-size:18px"></i></button></td>' +
+                                    '</tr>';
+                                $table.append(row);
+                                //console.log(newForm);
+                                $('#inject_forms_here').append(newForm);
+                                $('#remove_single_product'+index).click(function () {
+                                    $(this).closest(".tr_append-row").remove();
+                                    $('#invoice_billed_products_'+index).remove();
+                                });
+
+                            }
+
+                            function getVal(q, p){
+                                return parseInt(q) * parseFloat(p);
+                            }
+                        </script>
+                    {% endfor %}
+                    <script>
+                        $(document).ready(function () {
+                            $collectionHolder = $('#display_stock');
+                            $collectionHolder.data('index', $collectionHolder.find('#stock_list').length);
+                            var maxIndex = $collectionHolder.DataTable().rows().count()-1;
+                            $('#add_single_product').click( function () {
+                                maxIndex = maxIndex + 1;
+                                addNonStockForm(maxIndex)
+                            });
+                        });
+                        function addNonStockForm(index) {
+                            var $table = $('#display_selected_products');
+                            var $qty = $('#n_qty').val();
+                            var $p = $('#n_price').val();
+                            var $type = $('#n_type').val();
+                            var value = getVal($qty, $p);
+                            var $um = $('#n_um').val();
+                            var $name = $('#n_name').val();
+                            var newForm = $collectionHolder.data('prototype');
+                            newForm = newForm.replace(/__name__/g, index);
+                            newForm = newForm.replace(/\[name]" required="required"/g, '[name]" required="required" value="'+$name+'"');
+                            newForm = newForm.replace(/\[um]" required="required"/g, '[um]" required="required" value="'+$um+'"');
+                            newForm = newForm.replace(/\[qty]" required="required"/g, '[qty]" required="required" value="'+$qty+'"');
+                            newForm = newForm.replace(/\[price]" required="required"/g, '[price]" required="required" value="'+$p+'"');
+                            newForm = newForm.replace(/\[type]" required="required"/g, '[type]" required="required" value="'+$type+'"');
+                            newForm = newForm.replace(/\[value]" required="required"/g, '[value]" required="required" value="'+value+'"');
+                            newForm = newForm.replace(/\[hash]" required="required"/g, '[hash]" required="required" value="blank_search"');
+                            var row = '<tr class="tr_append-row">' +
+                                '<td>'+$name+'</td>' +
+                                '<td>'+$um+'</td>' +
+                                '<td>'+$qty+'</td>' +
+                                '<td>'+$p+'</td>' +
+                                '<td>'+getVal($qty, $p)+'</td>' +
+                                '<td align="right">'+'<button type="button" id="remove_single_product'+index+'"><i class="fa fa-trash" style="font-size:18px"></i></button></td>' +
+                                '</tr>';
+                            $table.append(row);
+                            //console.log(newForm);
+                            $('#inject_forms_here').append(newForm);
+                            $('#remove_single_product'+index).click(function () {
+                                $(this).closest(".tr_append-row").remove();
+                                $('#invoice_billed_products_'+index).remove();
+                            });
+                        }
+                        function getVal(q, p){
+                            return parseInt(q) * parseFloat(p);
+                        }
+                    </script>
+                    </tbody>
+                    <tfoot>
+                </table>
+            </div>
+            <div id="inject_forms_here" style="display: block;">
+                <!-- dynamic form injected with jquery -->
+
+            </div>
+        </div>
+    </div>
+    {{ form_row(form._token) }}
+    <div class="card-footer">{{ form_row(form.save) }}</div>
+    <script>
+        $(document).ready(function() {
+            $('#display_stock').DataTable();
+        } );
+    </script>
+{% endblock %}
